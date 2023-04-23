@@ -1,5 +1,6 @@
 package com.bobocode.entity;
 
+import com.bobocode.exception.AdvisorHasAssignedApplicationException;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -57,7 +58,7 @@ public class Advisor extends User {
 
     private void verifyHasNoAssignedApplication() {
         if (hasAssignedApplication()) {
-           throw new IllegalStateException("Advisor already has assigned application.");
+           throw new AdvisorHasAssignedApplicationException("Advisor already was assigned to some application.");
         }
     }
 

@@ -2,6 +2,7 @@ package com.bobocode.service;
 
 import com.bobocode.entity.Advisor;
 import com.bobocode.entity.Application;
+import com.bobocode.exception.AdvisorNotFoundException;
 import com.bobocode.reposiroty.AdvisorRepository;
 import com.bobocode.reposiroty.ApplicationRepository;
 import lombok.RequiredArgsConstructor;
@@ -18,7 +19,8 @@ public class CreditAdvisoryService {
     private final ApplicationRepository applicationRepository;
 
     public Optional<Application> loadTheOldestCorrespondingApplication(Long advisorId) {
-        Advisor advisor = advisorRepository.findById(advisorId).orElseThrow();
+        Advisor advisor = advisorRepository.findById(advisorId)
+                .orElseThrow(() -> new AdvisorNotFoundException("Cannot find an advisor by ID: " + advisorId));
 
         Pair<BigDecimal, BigDecimal> assignableAmountRange = advisor.getAssignableAmountRange();
         BigDecimal min = assignableAmountRange.getLeft();
