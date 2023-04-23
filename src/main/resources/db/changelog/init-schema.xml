@@ -63,7 +63,7 @@
             (
                 id           BIGSERIAL,
                 amount       MONEY       NOT NULL,
-                status       TEXT        NOT NULL,
+                status       TEXT        NOT NULL DEFAULT 'NEW',
                 created_at   TIMESTAMP   NOT NULL DEFAULT now(),
                 assigned_at  TIMESTAMP,
                 applicant_id INT         NOT NULL,
