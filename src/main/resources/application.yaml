@@ -14,3 +14,6 @@ spring:
         format_sql: true
   liquibase:
     changeLog: classpath:db/changelog/db.changelog-master.xml
+
+server:
+  port: 8181
