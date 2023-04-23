@@ -51,6 +51,12 @@ public class Application {
     @JoinColumn(name = "advisor_id")
     private Advisor advisor;
 
+    public void assignAdvisor(Advisor advisor) {
+        this.advisor = advisor;
+        this.status = ApplicationStatus.ASSIGNED;
+        this.assignedAt = LocalDateTime.now();
+    }
+
     public enum ApplicationStatus {
         NEW, ASSIGNED, ON_HOLD, APPROVED, CANCELED, DECLINED
     }

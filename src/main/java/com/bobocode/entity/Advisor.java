@@ -14,11 +14,20 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import org.apache.commons.lang3.tuple.Pair;
 import org.hibernate.Hibernate;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+
+import static com.bobocode.util.AdvisorAmountUtil.ASSOCIATE_MAX_AMOUNT_BOUND;
+import static com.bobocode.util.AdvisorAmountUtil.ASSOCIATE_MIN_AMOUNT_BOUND;
+import static com.bobocode.util.AdvisorAmountUtil.PARTNER_MAX_AMOUNT_BOUND;
+import static com.bobocode.util.AdvisorAmountUtil.PARTNER_MIN_AMOUNT_BOUND;
+import static com.bobocode.util.AdvisorAmountUtil.SENIOR_MAX_AMOUNT_BOUND;
+import static com.bobocode.util.AdvisorAmountUtil.SENIOR_MIN_AMOUNT_BOUND;
 
 @Getter
 @Setter
@@ -39,6 +48,31 @@ public class Advisor extends User {
     @ToString.Exclude
     @Setter(AccessLevel.PRIVATE)
     private List<Application> applications = new ArrayList<>();
+
+    public void assignApplication(Application application) {
+        verifyHasNoAssignedApplication();
+        applications.add(application);
+        application.assignAdvisor(this);
+    }
+
+    private void verifyHasNoAssignedApplication() {
+        if (hasAssignedApplication()) {
+           throw new IllegalStateException("Advisor already has assigned application.");
+        }
+    }
+
+    private boolean hasAssignedApplication() {
+        return applications.stream()
+                .anyMatch(application -> application.getStatus() == Application.ApplicationStatus.ASSIGNED);
+    }
+
+    public Pair<BigDecimal, BigDecimal> getAssignableAmountRange() {
+        return switch (role) {
+            case ASSOCIATE -> Pair.of(ASSOCIATE_MIN_AMOUNT_BOUND, ASSOCIATE_MAX_AMOUNT_BOUND);
+            case PARTNER -> Pair.of(PARTNER_MIN_AMOUNT_BOUND, PARTNER_MAX_AMOUNT_BOUND);
+            case SENIOR -> Pair.of(SENIOR_MIN_AMOUNT_BOUND, SENIOR_MAX_AMOUNT_BOUND);
+        };
+    }
 
     public enum AdvisorRole {
         ASSOCIATE, PARTNER, SENIOR
