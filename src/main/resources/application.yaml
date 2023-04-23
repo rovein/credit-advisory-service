@@ -1,0 +1,16 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/postgres?currentSchema=credit_advisory
+    username: postgres
+    password: postgres
+  jpa:
+    openInView: false
+    showSql: true
+    hibernate:
+      ddlAuto: validate
+    properties:
+      hibernate:
+        physical_naming_strategy: org.hibernate.boot.model.naming.CamelCaseToUnderscoresNamingStrategy
+        format_sql: true
+  liquibase:
+    changeLog: classpath:db/changelog/db.changelog-master.xml

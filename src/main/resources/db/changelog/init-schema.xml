@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<databaseChangeLog
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.6.xsd">
+    <changeSet id="2023-04-23 14:00:00" author="rkuznetsov">
+        <sql>
+            CREATE TABLE IF NOT EXISTS advisors
+            (
+                id       BIGSERIAL,
+                email    VARCHAR(255) NOT NULL,
+                username VARCHAR(255) NOT NULL,
+                role     TEXT         NOT NULL,
+                CONSTRAINT advisors_PK PRIMARY KEY (id),
+                CONSTRAINT advisors_email_AK UNIQUE (email),
+                CONSTRAINT advisors_username_AK UNIQUE (username),
+                CONSTRAINT advisors_role_check CHECK (role IN ('ASSOCIATE', 'PARTNER', 'SENIOR'))
+            );
+        </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet id="2023-04-23 14:10:00" author="rkuznetsov">
+        <sql>
+            CREATE TABLE IF NOT EXISTS applicants
+            (
+                id         BIGSERIAL,
+                email      VARCHAR(255) NOT NULL,
+                username   VARCHAR(255) NOT NULL,
+                first_name VARCHAR(255) NOT NULL,
+                last_name  VARCHAR(255) NOT NULL,
+                ssn        VARCHAR(255) NOT NULL,
+                city       VARCHAR(255) NOT NULL,
+                street     VARCHAR(255) NOT NULL,
+                number     VARCHAR(255) NOT NULL,
+                zip        INT          NOT NULL,
+                apt        VARCHAR(255) NOT NULL,
+                CONSTRAINT applicants_PK PRIMARY KEY (id),
+                CONSTRAINT users_email_AK UNIQUE (email),
+                CONSTRAINT users_username_AK UNIQUE (username),
+                CONSTRAINT applicants_ssn_AK UNIQUE (ssn)
+            );
+        </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet id="2023-04-23 14:20:00" author="rkuznetsov">
+        <sql>
+            CREATE TABLE IF NOT EXISTS phone_numbers
+            (
+                number       VARCHAR(255) NOT NULL,
+                type         TEXT         NOT NULL,
+                applicant_id INT,
+                CONSTRAINT phone_numbers_type_check CHECK (type IN ('HOME', 'WORK', 'MOBILE')),
+                CONSTRAINT phone_numbers_applicants_FK FOREIGN KEY (applicant_id) REFERENCES applicants (id)
+            );
+        </sql>
+        <rollback/>
+    </changeSet>
+    <changeSet id="2023-04-23 14:30:00" author="rkuznetsov">
+        <sql>
+            CREATE TABLE IF NOT EXISTS applications
+            (
+                id           BIGSERIAL,
+                amount       MONEY       NOT NULL,
+                status       TEXT        NOT NULL,
+                created_at   TIMESTAMP   NOT NULL DEFAULT now(),
+                assigned_at  TIMESTAMP,
+                applicant_id INT         NOT NULL,
+                advisor_id   INT,
+                CONSTRAINT applications_PK PRIMARY KEY (id),
+                CONSTRAINT applications_status_check
+                    CHECK (status IN ('NEW', 'ASSIGNED', 'ON_HOLD', 'APPROVED', 'CANCELED', 'DECLINED')),
+                CONSTRAINT applications_applicants_FK FOREIGN KEY (applicant_id) REFERENCES applicants (id),
+                CONSTRAINT applications_advisors_FK FOREIGN KEY (advisor_id) REFERENCES advisors (id)
+            );
+        </sql>
+        <rollback/>
+    </changeSet>
+</databaseChangeLog>
